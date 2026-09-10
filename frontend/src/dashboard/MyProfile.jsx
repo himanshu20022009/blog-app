@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthProvider";
+import Avatar from "../components/Avatar";
 
 function MyProfile() {
   const { profile } = useAuth();
@@ -9,15 +10,17 @@ function MyProfile() {
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg w-full">
           <div className="relative">
-            <img
+            <Avatar
+              name={profile?.user?.name}
               src={profile?.user?.photo?.url}
-              alt="avatar"
+              alt="profile avatar"
               className="w-full h-48 object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 transform translate-y-1/2">
-              <img
+              <Avatar
+                name={profile?.user?.name}
                 src={profile?.user?.photo?.url}
-                alt="avatar"
+                alt="profile avatar"
                 className="w-24 h-24 rounded-full mx-auto border-4 border-gray-700"
               />
             </div>

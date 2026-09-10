@@ -1,6 +1,18 @@
 import mongoose, { mongo } from "mongoose";
 import { Blog } from "../models/blog.model.js";
 import { v2 as cloudinary } from "cloudinary";
+
+const normalizeBlog = (blog) => {
+  const normalizedBlog = blog.toObject ? blog.toObject() : blog;
+  if (typeof normalizedBlog.blogImage === "string") {
+    normalizedBlog.blogImage = {
+      public_id: "",
+      url: normalizedBlog.blogImage,
+    };
+  }
+  return normalizedBlog;
+};
+
 export const createBlog = async (req, res) => {
   try {
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -65,7 +77,7 @@ export const deleteBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
   const allBlogs = await Blog.find();
-  res.status(200).json(allBlogs);
+  res.status(200).json(allBlogs.map(normalizeBlog));
 };
 
 export const getSingleBlogs = async (req, res) => {
@@ -77,13 +89,13 @@ export const getSingleBlogs = async (req, res) => {
   if (!blog) {
     return res.status(404).json({ message: "Blog not found" });
   }
-  res.status(200).json(blog);
+  res.status(200).json(normalizeBlog(blog));
 };
 
 export const getMyBlogs = async (req, res) => {
   const createdBy = req.user._id;
   const myBlogs = await Blog.find({ createdBy });
-  res.status(200).json(myBlogs);
+  res.status(200).json(myBlogs.map(normalizeBlog));
 };
 
 export const updateBlog = async (req, res) => {

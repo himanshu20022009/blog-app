@@ -5,6 +5,7 @@ import axios from "axios";
 import { CiMenuBurger } from "react-icons/ci";
 import { BiSolidLeftArrowAlt } from "react-icons/bi";
 import toast from "react-hot-toast";
+import Avatar from "../components/Avatar";
 
 function Sidebar({ setComponent }) {
   const { profile, setIsAuthenticated } = useAuth();
@@ -57,10 +58,11 @@ function Sidebar({ setComponent }) {
           <BiSolidLeftArrowAlt className="text-2xl" />
         </div>
         <div className="text-center">
-          <img
-            className="w-24 h-24 rounded-full mx-auto mb-2"
+          <Avatar
+            name={profile?.user?.name}
             src={profile?.user?.photo?.url}
-            alt=""
+            alt="profile avatar"
+            className="w-24 h-24 rounded-full mx-auto mb-2"
           />
           <p className="text-lg font-semibold">{profile?.user?.name}</p>
         </div>

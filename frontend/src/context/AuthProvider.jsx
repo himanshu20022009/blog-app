@@ -25,10 +25,14 @@ export const AuthProvider = ({ children }) => {
             }
           );
           console.log(data.user);
-          setProfile(data.user);
+          setProfile(data);
           setIsAuthenticated(true);
         }
       } catch (error) {
+        if (error.response?.status === 401) {
+          localStorage.removeItem("jwt");
+          setIsAuthenticated(false);
+        }
         console.log(error);
       }
     };

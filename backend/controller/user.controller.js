@@ -64,6 +64,7 @@ export const register = async (req, res) => {
           email: newUser.email,
           role: newUser.role,
           education: newUser.education,
+          photo: newUser.photo,
           avatar: newUser.avatar,
           createdOn: newUser.createdOn,
         },
@@ -104,6 +105,7 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+          photo: user.photo,
       },
       token: token,
     });
