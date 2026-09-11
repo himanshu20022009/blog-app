@@ -11,15 +11,24 @@ import cors from "cors";
 const app = express();
 dotenv.config();
 
-const port = process.env.PORT;
+const port = process.env.PORT || 4001;
 const MONOGO_URL = process.env.MONOG_URI;
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/$/, ""))
+  .filter(Boolean);
 
 //middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origin is not allowed by CORS"));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
@@ -41,6 +50,10 @@ try {
 }
 
 // defining routes
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use("/api/users", userRoute);
 app.use("/api/blogs", blogRoute);
 // Cloudinary
