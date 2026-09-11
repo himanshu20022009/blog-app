@@ -95,63 +95,73 @@ function Navbar() {
         </div>
         {/* mobile navbar */}
         {show && (
-          <div className="bg-white">
-            <ul className="flex flex-col h-screen items-center justify-center space-y-3 md:hidden text-xl">
+          <div className="bg-white border-t md:hidden">
+            <ul className="flex flex-col items-center justify-center space-y-3 py-6 text-lg">
               <Link
                 to="/"
-                onClick={() => setShow(!show)}
-                smooth="true"
-                duration={500}
-                offset={-70}
-                activeClass="active"
+                onClick={() => setShow(false)}
                 className="hover:text-blue-500"
               >
                 HOME
               </Link>
               <Link
                 to="/blogs"
-                onClick={() => setShow(!show)}
-                smooth="true"
-                duration={500}
-                offset={-70}
-                activeClass="active"
+                onClick={() => setShow(false)}
                 className="hover:text-blue-500"
               >
                 BLOGS
               </Link>
               <Link
                 to="/creators"
-                onClick={() => setShow(!show)}
-                smooth="true"
-                duration={500}
-                offset={-70}
-                activeClass="active"
+                onClick={() => setShow(false)}
                 className="hover:text-blue-500"
               >
                 CREATORS
               </Link>
               <Link
                 to="/about"
-                onClick={() => setShow(!show)}
-                smooth="true"
-                duration={500}
-                offset={-70}
-                activeClass="active"
+                onClick={() => setShow(false)}
                 className="hover:text-blue-500"
               >
                 ABOUT
               </Link>
               <Link
                 to="/contact"
-                onClick={() => setShow(!show)}
-                smooth="true"
-                duration={500}
-                offset={-70}
-                activeClass="active"
+                onClick={() => setShow(false)}
                 className="hover:text-blue-500"
               >
                 CONTACT
               </Link>
+
+              {isAuthenticated && profile?.user?.role === "admin" && (
+                <Link
+                  to="/dashboard"
+                  onClick={() => setShow(false)}
+                  className="w-full mx-4 rounded bg-blue-600 px-4 py-2 text-center font-semibold text-white hover:bg-blue-800"
+                >
+                  DASHBOARD
+                </Link>
+              )}
+
+              {!isAuthenticated ? (
+                <Link
+                  to="/login"
+                  onClick={() => setShow(false)}
+                  className="w-full mx-4 rounded bg-red-600 px-4 py-2 text-center font-semibold text-white hover:bg-red-800"
+                >
+                  LOGIN
+                </Link>
+              ) : (
+                <button
+                  onClick={(e) => {
+                    setShow(false);
+                    handleLogout(e);
+                  }}
+                  className="w-full mx-4 rounded bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-800"
+                >
+                  LOGOUT
+                </button>
+              )}
             </ul>
           </div>
         )}
