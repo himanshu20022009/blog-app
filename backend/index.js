@@ -17,6 +17,8 @@ const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
+const isLocalOrigin = (origin) =>
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 
 //middleware
 app.use(express.json());
@@ -24,10 +26,15 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      const normalizedOrigin = origin?.replace(/\/$/, "");
+      if (
+        !origin ||
+        allowedOrigins.includes(normalizedOrigin) ||
+        isLocalOrigin(normalizedOrigin)
+      ) {
         return callback(null, true);
       }
-      return callback(new Error("Origin is not allowed by CORS"));
+      return callback(new Error(`Origin is not allowed by CORS: ${origin}`));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
