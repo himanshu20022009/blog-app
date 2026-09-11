@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 import fileUpload from "express-fileupload";
 import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
+import fs from "fs";
+import os from "os";
+import path from "path";
 import userRoute from "./routes/user.route.js";
 import blogRoute from "./routes/blog.route.js";
 
@@ -13,6 +16,8 @@ dotenv.config();
 
 const port = process.env.PORT || 4001;
 const MONOGO_URL = process.env.MONOG_URI;
+const uploadTempDir = path.join(os.tmpdir(), "blog-app-uploads");
+fs.mkdirSync(uploadTempDir, { recursive: true });
 const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim().replace(/\/$/, ""))
@@ -44,17 +49,9 @@ app.use(
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "/tmp/",
+    tempFileDir: `${uploadTempDir}${path.sep}`,
   })
 );
-
-// DB Code
-try {
-  mongoose.connect(MONOGO_URL);
-  console.log("Conntected to MonogDB");
-} catch (error) {
-  console.log(error);
-}
 
 // defining routes
 app.get("/api/health", (_req, res) => {
@@ -70,6 +67,17 @@ cloudinary.config({
   api_secret: process.env.CLOUD_SECRET_KEY,
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+const startServer = async () => {
+  try {
+    await mongoose.connect(MONOGO_URL);
+    console.log("Connected to MongoDB");
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Unable to connect to MongoDB:", error);
+    process.exitCode = 1;
+  }
+};
+
+startServer();

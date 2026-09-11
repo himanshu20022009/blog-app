@@ -20,8 +20,12 @@ function Register() {
   const [photoPreview, setPhotoPreview] = useState("");
 
   const changePhotoHandler = (e) => {
-    console.log(e);
     const file = e.target.files[0];
+    if (!file) {
+      setPhoto("");
+      setPhotoPreview("");
+      return;
+    }
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
@@ -32,6 +36,11 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!name || !email || !phone || !password || !role || !education || !photo) {
+      toast.error("Please fill all required fields, including a profile photo");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
@@ -46,9 +55,6 @@ function Register() {
         formData,
         {
           withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
         }
       );
       console.log(data);
@@ -68,7 +74,10 @@ function Register() {
     } catch (error) {
       console.log(error);
       toast.error(
-        error.response.data.message || "Please fill the required fields"
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Unable to register. Please try again."
       );
     }
   };
@@ -85,6 +94,7 @@ function Register() {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
+              required
               className="w-full p-2 mb-4 border rounded-md"
             >
               <option value="">Select Role</option>
@@ -97,6 +107,7 @@ function Register() {
                 placeholder="Your Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
                 className="w-full p-2  border rounded-md"
               />
             </div>
@@ -106,6 +117,7 @@ function Register() {
                 placeholder="Your Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full p-2  border rounded-md"
               />
             </div>
@@ -115,6 +127,7 @@ function Register() {
                 placeholder="Your Phone Number"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                required
                 className="w-full p-2  border rounded-md"
               />
             </div>
@@ -124,12 +137,15 @@ function Register() {
                 placeholder="Your Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
+                required
                 className="w-full p-2  border rounded-md"
               />
             </div>
             <select
               value={education}
               onChange={(e) => setEducation(e.target.value)}
+              required
               className="w-full p-2 mb-4 border rounded-md"
             >
               <option value="">Select Your Education</option>
@@ -148,6 +164,8 @@ function Register() {
               <input
                 type="file"
                 onChange={changePhotoHandler}
+                accept="image/jpeg,image/png,image/webp"
+                required
                 className="w-full p-2  border rounded-md"
               />
             </div>

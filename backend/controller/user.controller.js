@@ -27,17 +27,25 @@ export const register = async (req, res) => {
     ) {
       return res.status(400).json({ message: "Please fill required fields" });
     }
-    const user = await User.findOne({ email });
+    if (!/^\d{7,15}$/.test(String(phone))) {
+      return res.status(400).json({ message: "Please enter a valid phone number" });
+    }
+    const user = await User.findOne({
+      $or: [{ email }, { phone: Number(phone) }],
+    });
     if (user) {
+      const message = user.email === email
+        ? "User already exists with this email"
+        : "User already exists with this phone number";
       return res
         .status(400)
-        .json({ message: "User already exists with this email" });
+        .json({ message });
     }
     const cloudinaryResponse = await cloudinary.uploader.upload(
       photo.tempFilePath
     );
     if (!cloudinaryResponse || cloudinaryResponse.error) {
-      console.log(cloudinaryResponse.error);
+      return res.status(502).json({ message: "Unable to upload user photo" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -73,7 +81,12 @@ export const register = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Internal Server error" });
+    if (error?.code === 11000) {
+      return res.status(409).json({
+        message: "A user already exists with this email or phone number",
+      });
+    }
+    return res.status(500).json({ message: "Unable to register user" });
   }
 };
 
@@ -85,6 +98,9 @@ export const login = async (req, res) => {
     }
     const user = await User.findOne({ email }).select("+password");
     console.log(user);
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
     if (!user.password) {
       return res.status(400).json({ message: "User password is missing" });
     }
