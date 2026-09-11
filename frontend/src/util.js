@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const BACKEND_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4001";
+  import.meta.env.VITE_API_URL || "https://blog-app-sclm.onrender.com";
 
 axios.defaults.withCredentials = true;
 
