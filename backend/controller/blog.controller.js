@@ -100,7 +100,7 @@ export const deleteBlog = async (req, res) => {
 };
 
 export const getAllBlogs = async (req, res) => {
-  const allBlogs = await Blog.find();
+  const allBlogs = await Blog.find().sort({ _id: -1 });
   res.status(200).json(allBlogs.map(normalizeBlog));
 };
 

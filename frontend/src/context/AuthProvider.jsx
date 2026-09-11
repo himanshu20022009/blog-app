@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         blogs,
+        setBlogs,
         profile,
         setProfile,
         isAuthenticated,

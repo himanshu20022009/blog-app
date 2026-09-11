@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { BACKEND_URL } from "../util";
 
 function Creator() {
@@ -25,7 +26,11 @@ function Creator() {
         {admin && admin.length > 0 ? (
           admin.slice(0, 4).map((element) => {
             return (
-              <div key={element._id}>
+              <Link
+                to={`/creator/${element._id}`}
+                key={element._id}
+                className="block hover:opacity-80 transition-opacity"
+              >
                 <div className="">
                   <img
                     src={element.photo.url}
@@ -37,7 +42,7 @@ function Creator() {
                     <p className="text-gray-600 text-xs">{element.role}</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         ) : (

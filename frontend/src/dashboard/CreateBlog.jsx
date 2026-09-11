@@ -2,8 +2,10 @@ import axios from "axios";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { BACKEND_URL } from "../util";
+import { useAuth } from "../context/AuthProvider";
 
 function CreateBlog() {
+  const { setBlogs } = useAuth();
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [about, setAbout] = useState("");
@@ -42,6 +44,7 @@ function CreateBlog() {
         }
       );
       console.log(data);
+      setBlogs((currentBlogs) => [data.blog, ...(currentBlogs || [])]);
       toast.success(data.message || "User registered successfully");
       setTitle("");
       setCategory("");
