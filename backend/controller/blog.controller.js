@@ -18,6 +18,7 @@ export const createBlog = async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({ message: "Blog Image is required" });
     }
+
     const { blogImage } = req.files;
     const allowedFormats = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedFormats.includes(blogImage.mimetype)) {
@@ -25,22 +26,37 @@ export const createBlog = async (req, res) => {
         message: "Invalid photo format. Only jpg and png are allowed",
       });
     }
+
     const { title, category, about } = req.body;
     if (!title || !category || !about) {
       return res
         .status(400)
         .json({ message: "title, category & about are required fields" });
     }
+
+    if (about.trim().length < 200) {
+      return res.status(400).json({
+        message: "Blog content should contain at least 200 characters.",
+      });
+    }
+
     const adminName = req?.user?.name;
     const adminPhoto = req?.user?.photo?.url;
     const createdBy = req?.user?._id;
 
+    if (!createdBy || !adminName) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
     const cloudinaryResponse = await cloudinary.uploader.upload(
       blogImage.tempFilePath
     );
+
     if (!cloudinaryResponse || cloudinaryResponse.error) {
-      console.log(cloudinaryResponse.error);
+      console.log(cloudinaryResponse?.error || "Cloudinary upload failed");
+      return res.status(500).json({ message: "Image upload failed" });
     }
+
     const blogData = {
       title,
       about,
@@ -53,6 +69,7 @@ export const createBlog = async (req, res) => {
         url: cloudinaryResponse.url,
       },
     };
+
     const blog = await Blog.create(blogData);
 
     res.status(201).json({
@@ -61,6 +78,13 @@ export const createBlog = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: error.message || "Blog validation failed",
+      });
+    }
+
     return res.status(500).json({ error: "Internal Server error" });
   }
 };

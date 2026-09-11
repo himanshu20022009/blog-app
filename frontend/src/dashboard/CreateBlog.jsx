@@ -50,7 +50,12 @@ function CreateBlog() {
       setBlogImagePreview("");
     } catch (error) {
       console.log(error);
-      toast.error(error.message || "Please fill the required fields");
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Please fill the required fields"
+      );
     }
   };
   return (
